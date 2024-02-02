@@ -1,0 +1,12 @@
+{
+    "watch": [
+        "src",
+        "notion_api_handler",
+        "bot-starter.ts"
+    ],
+    "ext": "ts",
+    "ignore": [
+        "**/**/*.spec.ts"
+    ],
+    "exec": "tsx server.ts"
+}
