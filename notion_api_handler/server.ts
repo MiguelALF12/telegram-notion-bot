@@ -1,6 +1,6 @@
-import Resources from "./notion.controller";
+import NotionResources from "./notion.controller";
 import { isFullPageOrDatabase } from "@notionhq/client";
-const resources = new Resources();
+const resources = new NotionResources();
 
 // resources.getResources().then((results) => {
 //     // console.log("results: ", results?.length);

@@ -1,7 +1,7 @@
 import notion from "./notion_cli";
 
 import { APIErrorCode, ClientErrorCode, isNotionClientError } from "@notionhq/client";
-class Resources {
+class NotionResources {
     databaseId: string;
 
     constructor() {
@@ -83,19 +83,59 @@ class Resources {
         }
     }
 
-    async getPageTypeProperties() {
+    async getPageTypeProperty() {
         try {
             const response = await notion.databases.retrieve({
                 database_id: this.databaseId
             });
 
-            let typeProp = response?.properties.Type;
-            if (typeProp && typeProp.type === 'select') {
-                typeProp.select.options.forEach((option: any) => {
-                    console.log(option.name);
+            let typeProps = response?.properties.Type;
+            let propsVals: any[] = [];
+            if (typeProps && typeProps.type === 'select') {
+                typeProps.select.options.forEach((option: any) => {
+                    propsVals.push(option.name);
                 });
             }
-            return response;
+            return propsVals;
+
+        } catch (error: unknown) {
+            if (isNotionClientError(error)) {
+                // error is now strongly typed to NotionClientError
+                switch (error.code) {
+                    case ClientErrorCode.RequestTimeout:
+                        console.error("[ClientErrorCode] Request timed out");
+                        break
+                    case APIErrorCode.ObjectNotFound:
+                        console.error("[APIErrorCode] Object not found");
+                        break
+                    case APIErrorCode.Unauthorized:
+                        console.error("[APIErrorCode] Unauthorized");
+                        break
+                    // ...
+                    default:
+                        // you could even take advantage of exhaustiveness checking
+                        console.error("An unexpected error occurred");
+
+                }
+            }
+        }
+
+    }
+
+    async getPageTagsProperty() {
+        try {
+            const response = await notion.databases.retrieve({
+                database_id: this.databaseId
+            });
+
+            let typeProp = response?.properties.Tags;
+            let propsVals: any[] = [];
+            if (typeProp && typeProp.type === 'multi_select') {
+                typeProp.multi_select.options.forEach((option: any) => {
+                    propsVals.push(option.name);
+                });
+            }
+            return propsVals;
 
         } catch (error: unknown) {
             if (isNotionClientError(error)) {
@@ -123,4 +163,4 @@ class Resources {
 
 }
 
-export default Resources;
+export default NotionResources;

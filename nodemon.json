@@ -2,7 +2,8 @@
     "watch": [
         "src",
         "notion_api_handler",
-        "bot-starter.ts"
+        "bot-starter.ts",
+        "tools/"
     ],
     "ext": "ts",
     "ignore": [

@@ -1,18 +1,38 @@
-import { Bot, GrammyError, HttpError } from "grammy";
+import { Bot, GrammyError, session, HttpError } from "grammy";
+import {
+    conversations,
+    createConversation,
+} from "@grammyjs/conversations";
+import { MyContext, MyConversation } from "./tools/types";
+import { TYPES_MENU, selectedTypes, tagsMenuMsg } from "./tools/menu";
+import { checkTextByAttribute } from "./tools/utils";
 import dotenv from "dotenv";
+
 dotenv.config();
 
-// Ensure BOT_TOKEN is defined
-const botToken: string = process.env.BOT_TOKEN || "";
-const bot = new Bot(botToken);
+
+// Define the context type and conversation type
+// export type MyContext = Context & SessionFlavor<unknown> & ConversationFlavor;
+// export type MyConversation = Conversation<MyContext>;
+
+/*
+    - TODO: Add a limit time to answer the questions, otherwise the conversation will be closed.
+    - TODO: Improve the edition of the selected types and tags.
+    - TODO: Add the notion resource to the workspace.
+    - ...
+*/
 
 
 class BotStarter {
     // Ensure BOT_TOKEN is defined
     private botToken: string = process.env.BOT_TOKEN || "";
-    public bot = new Bot(botToken);
+    public bot = new Bot<MyContext>(this.botToken);
+    private selectedTypesRef = selectedTypes;
+    private selectedTags: string = "";
 
     constructor() {
+        this.startPlugins();
+        this.setCommandSuggestion();
         this.startCommands();
         this.startResponses();
         this.startBot();
@@ -54,6 +74,15 @@ class BotStarter {
             }
         });
     }
+
+    private startPlugins() {
+        this.bot.use(TYPES_MENU)
+            .use(session({ initial: () => ({}) }))
+            .use(conversations())
+            .use(createConversation(this.addNotionResourceConversation, "addNotionResource"))
+
+    }
+
     private startCommands() {
         // // Start the bot.
         // this.bot.command("start", (ctx) => ctx.reply("Welcome! Up and running."));
@@ -63,21 +92,68 @@ class BotStarter {
         this.bot.start();
         // Custom command. -> implement AI to understand the user's request.
         this.bot.command("custom", (ctx) => ctx.reply("You triggered a custom command!"));
+
+        // Menu example
+        // this.bot.command("menu", async (ctx) => {
+        //     await ctx.reply("Checkout this menu: ", {
+        //         reply_markup: TYPES_MENU,
+        //     });
+        // });
+
         // ===== Notion related commands
-        // Get the notion resources.
-        this.bot.command("notionadd", (ctx) => {
-            let url: string = ctx.match;
-            console.log("Adding notion resources ... ", url);
-            // check if the url is not empty
-            // else, return an error message.
-            if (/^(ftp|http|https):\/\/[^ "]+$/.test(url)) {
-                // The string is a valid URL, add it to the notion resources.
-                ctx.reply(`You want to add this ${url} to your notion resources.`);
-            } else {
-                // The string is not a valid URL, return an error message.
-                ctx.reply("You need to provide a valid URL to add to your notion resources.");
-            }
+        // Get the notion resources through conversation.
+        this.bot.command("notionadd", async (ctx) => {
+            await ctx.conversation?.enter("addNotionResource");
         });
+
+    }
+
+
+    private async setCommandSuggestion() {
+        await this.bot.api.setMyCommands([
+            { command: "custom", description: "Custom command triggered" },
+            { command: "help", description: "Help you with yoour tasks" },
+            { command: "menu", description: "Menu example" },
+            { command: "notionadd", description: "Add a resource to your notion" },
+
+        ]);
+    }
+
+
+    private addNotionResourceConversation = async (conversation: MyConversation, ctx: MyContext) => {
+
+
+        await ctx.reply("Please provide the URL of the resource you want to add to your notion resources.");
+        let urlPromise = await conversation.wait();
+        if (urlPromise.msg?.text) {
+            if (checkTextByAttribute(urlPromise.msg.text, "url")) {
+                await ctx.reply("The URL is valid.");
+            } else {
+                await ctx.reply("The URL is not valid.");
+                await this.addNotionResourceConversation(conversation, ctx);
+            }
+        }
+        await ctx.reply("Select the type of resource: ", {
+            reply_markup: TYPES_MENU,
+        });
+
+        // Wait for the type
+        await conversation.waitForCommand(["closetypes"]);
+        // Wait for the tags
+        await ctx.reply(tagsMenuMsg);
+        let tags = await conversation.wait();
+
+        if (tags.msg?.text) this.selectedTags = tags.msg.text;
+
+        await ctx.reply(`You selected the following types: ${this.selectedTypesRef.keys()} and the following tags: ${this.selectedTags}`);
+        await ctx.reply("Do you want to edit the selected types or tags?\ny-yes\nn-no\n");
+        let wantEdit = await conversation.wait();
+        if (wantEdit.msg?.text && wantEdit.msg?.text === "y") {
+            await this.addNotionResourceConversation(conversation, ctx);
+        } else {
+            //send and return
+            return;
+        }
 
     }
 
