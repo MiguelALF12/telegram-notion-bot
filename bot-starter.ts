@@ -13,17 +13,6 @@ import { isNotionClientError } from "@notionhq/client";
 dotenv.config();
 
 
-// Define the context type and conversation type
-// export type MyContext = Context & SessionFlavor<unknown> & ConversationFlavor;
-// export type MyConversation = Conversation<MyContext>;
-
-/*
-    - TODO: Add a limit time to answer the questions, otherwise the conversation will be closed.
-    - TODO: Improve the edition of the selected types and tags.
-    - TODO: Add the notion resource to the workspace.
-    - ...
-*/
-
 
 class BotStarter {
     // Ensure BOT_TOKEN is defined
