@@ -1,6 +1,7 @@
 import notion from "./notion_cli";
-
 import { APIErrorCode, ClientErrorCode, isNotionClientError } from "@notionhq/client";
+
+
 class NotionResources {
     databaseId: string;
 
@@ -46,9 +47,11 @@ class NotionResources {
                     // ...
                     default:
                         // you could even take advantage of exhaustiveness checking
-                        console.error("An unexpected error occurred");
+                        console.error("An unexpected error occurred with the NotionClient");
 
                 }
+            } else {
+                console.error("An unexpected error occurred. This is not related with the NotionClient");
             }
         }
     }
@@ -56,8 +59,8 @@ class NotionResources {
     async addResource(resource: any) {
         try {
             const response = await notion.pages.create({
-                parent: { database_id: this.databaseId },
-                properties: resource
+                parent: { type: "database_id", database_id: this.databaseId },
+                properties: resource,
             });
             return response;
         } catch (error: unknown) {
@@ -76,9 +79,11 @@ class NotionResources {
                     // ...
                     default:
                         // you could even take advantage of exhaustiveness checking
-                        console.error("An unexpected error occurred");
+                        console.error("An unexpected error occurred with the NotionClient");
 
                 }
+            } else {
+                console.error("An unexpected error occurred. This is not related with the NotionClient");
             }
         }
     }
@@ -114,9 +119,11 @@ class NotionResources {
                     // ...
                     default:
                         // you could even take advantage of exhaustiveness checking
-                        console.error("An unexpected error occurred");
+                        console.error("An unexpected error occurred with the NotionClient");
 
                 }
+            } else {
+                console.error("An unexpected error occurred. This is not related with the NotionClient");
             }
         }
 
@@ -153,9 +160,11 @@ class NotionResources {
                     // ...
                     default:
                         // you could even take advantage of exhaustiveness checking
-                        console.error("An unexpected error occurred");
+                        console.error("An unexpected error occurred with the NotionClient");
 
                 }
+            } else {
+                console.error("An unexpected error occurred. This is not related with the NotionClient");
             }
         }
 

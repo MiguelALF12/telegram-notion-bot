@@ -1,7 +1,7 @@
 import NotionResources from "../notion_api_handler/notion.controller";
 import { Menu } from "@grammyjs/menu";
 import { MyContext } from "./types";
-
+import { toggleSelectedType } from "./utils";
 
 
 //=============== Get the notion resource properties.
@@ -45,73 +45,73 @@ selectedTypes.set("movie", false);
 export const TYPES_MENU = new Menu<MyContext>("typemenu", { onMenuOutdated: false })
     .text(() => selectedTypes.get("article") ? "📠 Article ✅" : "📠 Article"
         , (ctx) => {
-            selectedTypes.set("article", !selectedTypes.get("article"));
-            ctx.menu.update()
+            if (toggleSelectedType("article", !selectedTypes.get("article"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("series") ? "📺 TV Series ✅" : "📺 TV Series"
         , (ctx) => {
-            selectedTypes.set("series", !selectedTypes.get("series"));
-            ctx.menu.update()
+            if (toggleSelectedType("series", !selectedTypes.get("series"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("film") ? "📽 Film ✅" : "📽 Film"
         , (ctx) => {
-            selectedTypes.set("film", !selectedTypes.get("film"));
-            ctx.menu.update()
+            if (toggleSelectedType("film", !selectedTypes.get("film"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("podcast") ? "🎙 Podcast ✅" : "🎙 Podcast"
         , (ctx) => {
-            selectedTypes.set("podcast", !selectedTypes.get("podcast"));
-            ctx.menu.update()
+            if (toggleSelectedType("podcast", !selectedTypes.get("podcast"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("academic_journal") ? "🎓 Journal ✅" : "🎓 Journal"
         , (ctx) => {
-            selectedTypes.set("academic_journal", !selectedTypes.get("academic_journal"));
-            ctx.menu.update()
+            if (toggleSelectedType("academic_journal", !selectedTypes.get("academic_journal"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("essay_resource") ? "📚 Essay Resource ✅" : "📚 Essay Resource"
         , (ctx) => {
-            selectedTypes.set("essay_resource", !selectedTypes.get("essay_resource"));
-            ctx.menu.update()
+            if (toggleSelectedType("essay_resource", !selectedTypes.get("essay_resource"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("video") ? "🎥 Video ✅" : "🎥 Video"
         , (ctx) => {
-            selectedTypes.set("video", !selectedTypes.get("video"));
-            ctx.menu.update()
+            if (toggleSelectedType("video", !selectedTypes.get("video"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("book") ? "📒 Book ✅" : "📒 Book"
         , (ctx) => {
-            selectedTypes.set("book", !selectedTypes.get("book"));
-            ctx.menu.update()
+            if (toggleSelectedType("book", !selectedTypes.get("book"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("tool") ? "🛠 tool ✅" : "🛠 tool"
         , (ctx) => {
-            selectedTypes.set("tool", !selectedTypes.get("tool"));
-            ctx.menu.update()
+            if (toggleSelectedType("tool", !selectedTypes.get("tool"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("stackoverflow") ? "🔑 StackOVerflow ✅" : "🔑 StackOVerflow"
         , (ctx) => {
-            selectedTypes.set("stackoverflow", !selectedTypes.get("stackoverflow"));
-            ctx.menu.update()
+            if (toggleSelectedType("stackoverflow", !selectedTypes.get("stackoverflow"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("site") ? "🖥 Site ✅" : "🖥 Site"
         , (ctx) => {
-            selectedTypes.set("site", !selectedTypes.get("site"));
-            ctx.menu.update()
+            if (toggleSelectedType("site", !selectedTypes.get("site"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("course") ? "🔌 Course ✅" : "🔌 Course"
         , (ctx) => {
-            selectedTypes.set("course", !selectedTypes.get("course"));
-            ctx.menu.update()
+            if (toggleSelectedType("course", !selectedTypes.get("course"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("completed_course") ? "💡 Completed-course ✅" : "💡 Completed-course"
         , (ctx) => {
-            selectedTypes.set("completed_course", !selectedTypes.get("completed_course"));
-            ctx.menu.update()
+            if (toggleSelectedType("completed_course", !selectedTypes.get("completed_course"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
     .text(() => selectedTypes.get("movie") ? "📼 Movie ✅" : "📼 Movie"
         , (ctx) => {
-            selectedTypes.set("movie", !selectedTypes.get("movie"));
-            ctx.menu.update()
+            if (toggleSelectedType("movie", !selectedTypes.get("movie"), selectedTypes)) ctx.menu.update()
+            else ctx.reply("You have already selected a type, please unselect it to select another one.")
         }).row()
 
 // Define the selected tags

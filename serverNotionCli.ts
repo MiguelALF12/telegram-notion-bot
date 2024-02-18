@@ -1,9 +1,9 @@
-import NotionResources from "./notion.controller";
+import NotionResources from "./notion_api_handler/notion.controller";
 import { isFullPageOrDatabase } from "@notionhq/client";
 const resources = new NotionResources();
 
 // resources.getResources().then((results) => {
-//     // console.log("results: ", results?.length);
+//     console.log("results: ", results);
 //     // results?.forEach((result: any) => {
 //     //     console.log(result.properties, "\n");
 //     //     console.log(result.properties.Name.title[0]?.plain_text);
@@ -12,11 +12,13 @@ const resources = new NotionResources();
 //     console.error(error);
 // });
 
+console.log(__dirname);
+console.log(process.cwd());
+
 const newResource = {
     Type: {
         select: {
-            name: 'Site',
-            color: 'red'
+            name: 'tool'
         }
     },
     Link: {
@@ -26,8 +28,12 @@ const newResource = {
         relation: [],
         has_more: false
     },
-    'Multi-select': {
-        multi_select: []
+    'Tags': {
+        multi_select: [
+            { name: 'Repos' },
+            { name: 'Node' },
+            { name: 'JavaScript' }
+        ]
     },
     Course: {
         relation: [],
@@ -36,14 +42,14 @@ const newResource = {
     Name: {
         title: [{
             text: {
-                content: "Test Resource"
+                content: "Test Resource v2.1"
             }
         }]
     }
 }
-
-// resources.addResource(newResource).then((response) => {
-//     console.log("response: ", response);
-// }).catch((error) => {
-//     console.error(error);
-// });
+console.log("newResource: ", newResource);
+resources.addResource(newResource).then((response) => {
+    console.log("response: ", response);
+}).catch((error) => {
+    console.error(error);
+});

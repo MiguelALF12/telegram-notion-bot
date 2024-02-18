@@ -3,10 +3,12 @@ import {
     conversations,
     createConversation,
 } from "@grammyjs/conversations";
-import { MyContext, MyConversation } from "./tools/types";
-import { TYPES_MENU, selectedTypes, tagsMenuMsg } from "./tools/menu";
-import { checkTextByAttribute } from "./tools/utils";
 import dotenv from "dotenv";
+
+import { MyContext, MyConversation } from "./tools/types";
+import { TYPES_MENU, selectedTypes, tags, tagsMenuMsg } from "./tools/menu";
+import { checkTextByAttribute, sendNotionResource } from "./tools/utils";
+import { isNotionClientError } from "@notionhq/client";
 
 dotenv.config();
 
@@ -28,7 +30,6 @@ class BotStarter {
     private botToken: string = process.env.BOT_TOKEN || "";
     public bot = new Bot<MyContext>(this.botToken);
     private selectedTypesRef = selectedTypes;
-    private selectedTags: string = "";
 
     constructor() {
         this.startPlugins();
@@ -122,7 +123,7 @@ class BotStarter {
 
     private addNotionResourceConversation = async (conversation: MyConversation, ctx: MyContext) => {
 
-
+        // Get the URL and parse it
         await ctx.reply("Please provide the URL of the resource you want to add to your notion resources.");
         let urlPromise = await conversation.wait();
         if (urlPromise.msg?.text) {
@@ -133,27 +134,72 @@ class BotStarter {
                 await this.addNotionResourceConversation(conversation, ctx);
             }
         }
+        //Select the resource's type
         await ctx.reply("Select the type of resource: ", {
             reply_markup: TYPES_MENU,
         });
-
-        // Wait for the type
         await conversation.waitForCommand(["closetypes"]);
-        // Wait for the tags
+
+        // Select the tags of the resource
         await ctx.reply(tagsMenuMsg);
-        let tags = await conversation.wait();
-
-        if (tags.msg?.text) this.selectedTags = tags.msg.text;
-
-        await ctx.reply(`You selected the following types: ${this.selectedTypesRef.keys()} and the following tags: ${this.selectedTags}`);
-        await ctx.reply("Do you want to edit the selected types or tags?\ny-yes\nn-no\n");
-        let wantEdit = await conversation.wait();
-        if (wantEdit.msg?.text && wantEdit.msg?.text === "y") {
-            await this.addNotionResourceConversation(conversation, ctx);
-        } else {
-            //send and return
-            return;
+        let selectedTags = await conversation.wait();
+        /*
+        check the selectedTags here
+        */
+        if (selectedTags.msg?.text) {
+            if (checkTextByAttribute(selectedTags.msg?.text, "tags", tags.length)) {
+                await ctx.reply("The given tags are valid.");
+            } else {
+                await ctx.reply("There is an error in the tags. Possibly a number is not valid or the tags are not separated by a comma. Please provide the tags again.");
+                await this.addNotionResourceConversation(conversation, ctx);
+            }
         }
+
+
+        // Select the name of the resource
+        await ctx.reply("Please provide the name of the resource.");
+        let name = await conversation.wait();
+
+        // Show the selected types and tags
+        let typesMsg: string = "";
+        for (let [key, value] of this.selectedTypesRef) {
+            if (value) { typesMsg = `[ ${key} ]\n`; break };
+        }
+        await ctx.reply(`Your resource ${name.msg?.text} is a ${typesMsg} \n with the following tags: ${selectedTags.msg?.text}`);
+
+        // Add the resource to the notion workspace
+        // ctx.reply("This will be added to your notion resources. Once added, you will be able to see it in your notion workspace. I'll let you know when it's done. 🚀");
+
+
+        sendNotionResource(
+            {
+                name: name.msg?.text,
+                url: urlPromise.msg?.text,
+                type: this.selectedTypesRef,
+                tags: selectedTags.msg?.text
+            }
+        ).then((response) => {
+            if (response) {
+                ctx.reply("The resource was added to your notion workspace.");
+            } else {
+                console.log("response: ", response);
+                ctx.reply("We are having trouble adding the resource to your notion workspace. Please try again later.");
+            }
+
+        })
+
+
+        //show the response of the notion resource addition
+
+        //option to edit the selected types and tags
+        // await ctx.reply("Do you want to edit the selected types or tags?\ny-yes\nn-no\n");
+        // let wantEdit = await conversation.wait();
+        // if (wantEdit.msg?.text && wantEdit.msg?.text === "y") {
+        //     await this.addNotionResourceConversation(conversation, ctx);
+        // } else {
+        //     //send and return
+        //     return;
+        // }
 
     }
 
