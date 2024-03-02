@@ -1,4 +1,8 @@
+
 # Telegram Bot to add pages to a notion database
+
+## Project Status
+> IMPORTANT UPDATE: This project is no longer in active development. While the initial groundwork has been laid, and some functionalities may be partially implemented, there will be no further updates, features, or fixes.
 
 ## Description
 
